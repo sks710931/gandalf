@@ -19,7 +19,7 @@ export const Salecard = () => {
         const getMints = async () => {
           const provider = new JsonRpcProvider(rpc);
             const contract = new Contract(NFTContract, abi, provider );
-            contract.on("CreateGoblindeeznutsNFT", async () => {
+            contract.on("CreateLeetoriNFT", async () => {
                 const mint2 = await contract.totalSupply();
                 setMints(Number(formatUnits(mint2, 0)));
             });
@@ -34,19 +34,19 @@ export const Salecard = () => {
   const classes = UseStyle();
   return (
     <div className={classes.main}>
-      <div className={classes.title}>{mints} / 10000</div>
+      <div className={classes.title}>{mints} / 29</div>
       <div className={classes.address}>
         <Button
           className={classes.contractButton}
           variant="text"
           color="primary"
           endIcon={<OpenInNewIcon />}
-          onClick={() => window.open(`https://snowtrace.io/token/${NFTContract}`, "_blank")}
+          onClick={() => window.open(`https://etherscan.io/token/${NFTContract}`, "_blank")}
         >
           NFT Contract
         </Button>
       </div>
-      <div className={classes.cost}>1 Goblindeeznuts.wtf NFT costs {price} AVAX.</div>
+      <div className={classes.cost}>1 Leetori NFT costs {price} ETH.</div>
 
      {!account &&  <Connect />}
       {account && <Buy />}

@@ -30,7 +30,7 @@ export const Buy = () => {
           };
           const txResult = await contract.mint(value, overRides);
           await txResult.wait();
-          alert(`${value} Goblindeeznuts NFT's minted successfully!`);
+          alert(`${value} Leetori NFT's minted successfully!`);
         
       } catch (err: any) {
         if (err.data) {
@@ -122,7 +122,7 @@ export const Buy = () => {
           variant="contained"
         >
           {" "}
-          Mint Goblindeeznuts NFT
+          Mint Leetori NFT
         </Button>
       </div>
     </>

@@ -43,7 +43,7 @@ const UseStyle = makeStyles((theme: Theme) =>
         main: {
             width: '100%',
             minHeight: '100vh',
-            backgroundImage: 'radial-gradient(white,white);',
+            backgroundImage: 'radial-gradient(#7b4397,#dc2430);',
             marginTop: 16
         },
         center: {

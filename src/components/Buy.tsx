@@ -2,14 +2,16 @@ import { Button, Chip, IconButton, Theme } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import RemoveCircleOutlinedIcon from "@mui/icons-material/RemoveCircleOutlined";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Contract } from "@ethersproject/contracts";
 import { NFTContract } from "../connectors/address";
 import abi from "../abi/abi.json";
 import { formatUnits, parseUnits } from "@ethersproject/units";
-
-export const Buy = () => {
+interface Props {
+  freeClaimed: boolean;
+}
+export const Buy = ({freeClaimed}: Props) => {
   const classes = UseStyle();
   const [value, setValue] = useState(1);
   const [salePrice, setSalePrice] = useState(0);
@@ -30,18 +32,46 @@ export const Buy = () => {
           };
           const txResult = await contract.mint(value, overRides);
           await txResult.wait();
-          alert(`${value} Leetori NFT's minted successfully!`);
+          alert(`${value} E.R.V Gandalf NFT's minted successfully!`);
         
       } catch (err: any) {
-        if (err.data) {
-          if (err.data.code === -32000) {
+        console.log(err)
+        if (err.error) {
+          if (err.error.code === -32000) {
             alert("Insufficient Funds");
           } else {
-            alert(err.data.message);
+            alert(err.error.message);
             console.log(err.code);
           }
         } else {
-          if (err.code === 4001) {
+          if (err.error.code === 4001) {
+            alert("User denied transaction signature.");
+          } else alert("Transaction Error");
+        }
+      }
+    }
+  };
+  const claimFreeMint = async () => {
+    if (account && library) {
+      try {
+        const signer = await library.getSigner();
+        
+          const contract = new Contract(NFTContract, abi, signer);
+          const txResult = await contract.mint(value);
+          await txResult.wait();
+          alert(`Free E.R.V Gandalf NFT's claimed successfully!`);
+        
+      } catch (err: any) {
+        console.log(err)
+        if (err.error) {
+          if (err.error.code === -32000) {
+            alert("Insufficient Funds");
+          } else {
+            alert(err.error.message);
+            console.log(err.code);
+          }
+        } else {
+          if (err.error.code === 4001) {
             alert("User denied transaction signature.");
           } else alert("Transaction Error");
         }
@@ -80,8 +110,11 @@ export const Buy = () => {
           {account}{" "}
         </span>
       </div>
-      <div className={classes.title}>Click buy to mint your NFT.</div>
-      <div
+      <div className={classes.title}>{freeClaimed ? "Click buy to mint your NFT." : "Click to claim your free NFT."}</div>
+      {
+        freeClaimed ? (
+          <Fragment>
+            <div
         style={{
           display: "flex",
           justifyContent: "center",
@@ -122,9 +155,35 @@ export const Buy = () => {
           variant="contained"
         >
           {" "}
-          Mint Leetori NFT
+          Mint E.R.V Gandalf NFT
         </Button>
       </div>
+          </Fragment>
+        ) : (
+          <div
+        style={{
+          textAlign: "center",
+          paddingTop: "24px",
+          paddingBottom: "16px",
+        }}
+      >
+        <Button
+          onClick={() => claimFreeMint()}
+          color="primary"
+          sx={{
+            fontSize: "12px",
+            height: "36px",
+            backgroundColor: "#000",
+            borderRadius: "18px",
+          }}
+          variant="contained"
+        >
+          {" "}
+          Claim Free NFT
+        </Button>
+      </div>
+        )
+      }
     </>
   );
 };

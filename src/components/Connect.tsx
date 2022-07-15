@@ -21,11 +21,10 @@ export const Connect = () => {
       activate(injectedConnector);
       setIsOpen(false);
   }
-
   
   return (
     <>
-      <div className={classes.title}>Connect to the Avalanche Network.</div>
+      <div className={classes.title}>Connect to the Ethereum Network.</div>
       <div style={{ textAlign: "center", paddingTop: "24px" }}>
         <Button
           sx={{

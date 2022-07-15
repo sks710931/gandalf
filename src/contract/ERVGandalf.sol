@@ -562,7 +562,7 @@ contract ERC721A is
     // _currentIndex and _burnCounter into a single 256bit word.
 
     // The tokenId of the next token to be minted.
-    uint128 internal _currentIndex;
+    uint128 internal _currentIndex = 1;
 
     // The number of tokens burned.
     uint128 internal _burnCounter;
@@ -595,7 +595,7 @@ contract ERC721A is
         // Counter underflow is impossible as _burnCounter cannot be incremented
         // more than _currentIndex times
         unchecked {
-            return _currentIndex - _burnCounter;
+            return _currentIndex - _burnCounter -1;
         }
     }
 
@@ -1022,46 +1022,47 @@ contract ERC721A is
     ) internal virtual {}
 }
 
-contract LeetoriNFT is ERC721A, ReentrancyGuard, Ownable {
+contract ERVGandalf is ERC721A, ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
-    uint256 public MAX_ELEMENTS = 29;
-    uint256 public PRICE = 0;
+    uint256 public MAX_ELEMENTS = 2930;
+    uint256 public PRICE = 88 * 10**14; //0.0088 Ether
+    uint256 public SALE_START ; // July 18, 2022 00:00:00 UTC
 
     bool public isPaused = false;
 
     string public baseTokenURI;
-    event CreateLeetoriNFT(uint256 indexed id);
 
-    constructor(string memory baseURI) ERC721A("Leetori", "LEETORI") {
+    mapping(address => bool) _freeClaimed;
+
+    event CreateERVGandalfNFT(uint256 indexed id);
+
+    constructor(string memory baseURI) ERC721A("E.R.V Gandalf", "GANDALF") {
         baseTokenURI = baseURI;
         _tokenIdTracker.increment();
     }
 
-    function mint(uint256 _count) public payable onlyOwner {
-        uint256 total = _tokenIdTracker.current().sub(1);
+    function mint(uint256 _count) public payable {
+        uint256 total = totalSupply();
+        require(SALE_START < block.timestamp, "Minting not started");
+        require(!isPaused, "Sale is Paused.");
         require(total + _count <= MAX_ELEMENTS, "Max limit");
         require(total <= MAX_ELEMENTS, "All NFT's are sold out");
-        require(!isPaused, "Sale is Paused.");
-        require(msg.value >= salePrice(_count), "Value below price");
+        if(_freeClaimed[_msgSender()]){
+            require(msg.value >= salePrice(_count), "Value below price");
+        }else{
+            require(_count == 1, "Can not mint more than 1 free NFT");
+            _freeClaimed[_msgSender()] = true;
+        }
         _safeMint(_msgSender(), _count);
-        emit CreateLeetoriNFT(_count);
+        emit CreateERVGandalfNFT(_count);
         _withdraw(owner(), address(this).balance);
     }
 
-    function airdropNFT(address[] memory winners) public onlyOwner {
-        uint256 total = _tokenIdTracker.current().sub(1);
-        require(total + winners.length <= MAX_ELEMENTS, "Max limit");
-        require(
-            winners.length > 0,
-            "Please provide the list of wallets for the airdrop"
-        );
-        for (uint256 i = 0; i < winners.length; i++) {
-            _safeMint(winners[i], 1);
-            emit CreateLeetoriNFT(1);
-        }
+    function isFreeClaimed(address _sender) public view returns(bool){
+        return _freeClaimed[_sender];
     }
 
     function salePrice(uint256 _count) public view returns (uint256) {
@@ -1088,7 +1089,7 @@ contract LeetoriNFT is ERC721A, ReentrancyGuard, Ownable {
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        uint256 metaId = tokenId + 1;
+        uint256 metaId = tokenId;
         string memory uriSuffix = ".json";
         string memory currentBaseURI = _baseURI();
 
@@ -1135,6 +1136,10 @@ contract LeetoriNFT is ERC721A, ReentrancyGuard, Ownable {
         PRICE = _price;
     }
 
+    function setSaleStart(uint256 _time) external onlyOwner {
+        SALE_START = _time;
+    }
+    
     function withdrawAll() external nonReentrant onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0);

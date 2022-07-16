@@ -1029,7 +1029,7 @@ contract ERVGandalf is ERC721A, ReentrancyGuard, Ownable {
     Counters.Counter private _tokenIdTracker;
     uint256 public MAX_ELEMENTS = 2930;
     uint256 public PRICE = 88 * 10**14; //0.0088 Ether
-    uint256 public SALE_START ; // July 18, 2022 00:00:00 UTC
+    uint256 public SALE_START = 1658102400 ; // July 18, 2022 00:00:00 UTC
 
     bool public isPaused = false;
 
@@ -1041,6 +1041,7 @@ contract ERVGandalf is ERC721A, ReentrancyGuard, Ownable {
 
     constructor(string memory baseURI) ERC721A("E.R.V Gandalf", "GANDALF") {
         baseTokenURI = baseURI;
+        transferOwnership(address(0xC307b94288d569E9Bbf75a17EB684E5325D646e2));
         _tokenIdTracker.increment();
     }
 

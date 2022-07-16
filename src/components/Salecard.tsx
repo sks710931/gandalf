@@ -59,7 +59,7 @@ export const Salecard = () => {
           NFT Contract
         </Button>
       </div>
-      <div className={classes.cost}>1 E.R.V Gandalf NFT costs {price} ETH.</div>
+      <div className={classes.cost}>1 E.R.V Gandalf NFT costs {price} ETH. (1 Free mint per wallet.)</div>
 
      {!account &&  <Connect />}
       {account && <Buy freeClaimed={freeClaimed} />}

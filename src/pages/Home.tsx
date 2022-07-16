@@ -4,7 +4,7 @@ import {  makeStyles } from '@mui/styles';
 import logo from '../assets/logo.png';
 import icons from '../assets/icons.gif';
 import { Salecard } from '../components/Salecard';
-
+import bgImage from "../assets/bg.jpg";
 export const Home = () => {
     const classes = UseStyle();
     return (
@@ -30,7 +30,7 @@ export const Home = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <div className={classes.center}>
-                        <div className={classes.footer}>Please make sure you are connected to the right network (Ethereum Mainnet) and the correct address. Please note: Once you make the purchase, you cannot undone the action.</div>
+                        <div style={{color:"red"}} className={classes.footer}>Please make sure you are connected to the right network (Ethereum Mainnet) and the correct address. Please note: Once you make the purchase, you cannot undone the action.</div>
                         </div>
                 </Grid>
             </Grid>
@@ -43,7 +43,8 @@ const UseStyle = makeStyles((theme: Theme) =>
         main: {
             width: '100%',
             minHeight: '100vh',
-            backgroundImage: 'radial-gradient(#7b4397,#dc2430);',
+            background: `url(${bgImage}) center center`,
+            objectFit: "contain",
             marginTop: 16
         },
         center: {

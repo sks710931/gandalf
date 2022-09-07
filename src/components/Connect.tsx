@@ -17,8 +17,8 @@ export const Connect = () => {
   const classes = UseStyle();
   const [isOpen, setIsOpen] = useState(false);
   const { activate} = useWeb3React();
-  const handleMetamaskClick = () => {
-      activate(injectedConnector);
+  const handleMetamaskClick = async () => {
+      await activate(injectedConnector);
       setIsOpen(false);
   }
   
@@ -77,6 +77,7 @@ const UseStyle = makeStyles((theme: Theme) =>
       fontWeight: "400",
       fontSize: "16px",
       textAlign: "center",
+      color: "#ffffff !important",
     },
     dlg: {
       width: 450,

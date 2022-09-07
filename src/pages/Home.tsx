@@ -2,13 +2,14 @@ import { Grid, Theme} from '@mui/material';
 import {  makeStyles } from '@mui/styles';
 
 import logo from '../assets/logo.png';
-import icons from '../assets/icons.gif';
+import icons from '../assets/icons.jpg';
 import { Salecard } from '../components/Salecard';
-import bgImage from "../assets/bg.jpg";
+import bgImage from "../assets/bg.png";
 export const Home = () => {
     const classes = UseStyle();
     return (
         <div className={classes.main}>
+            <div style={{width: "100%",height:"100vh" ,backdropFilter: "blur(16px)"}}>
             <Grid container spacing={2}>
                 <Grid item className="top" xs={12}>
                     <div className={classes.center}>
@@ -34,6 +35,7 @@ export const Home = () => {
                         </div>
                 </Grid>
             </Grid>
+            </div>
         </div>
     )
 }
@@ -44,11 +46,11 @@ const UseStyle = makeStyles((theme: Theme) =>
             width: '100%',
             minHeight: '100vh',
             background: `url(${bgImage}) center center`,
-            objectFit: "contain",
+            backgroundSize: 'cover',
             marginTop: 16
         },
         center: {
-            width: '100%', textAlign: 'center'
+            width: '100%' , textAlign: 'center'
         },
         logo: {
             width: '270px',
@@ -56,15 +58,15 @@ const UseStyle = makeStyles((theme: Theme) =>
             borderRadius: '50%',
             marginTop: '48px',
             marginBottom: '40px',
-            border: '1px solid #a47573',
-            boxShadow: 'rgba(0, 0, 0, 0.75) 0px 5px 15px;'
+            boxShadow: 'rgba(0, 0, 0, 0.75) 0px 5px 15px;',
+            border: '1px solid #ffffff60',
         },
         icons: {
             maxWidth: '260px',
             height: 'auto',
             borderRadius: '50%',
             marginTop: '40px',
-            border: '1px solid #a47573',
+            border: '1px solid #ffffff20',
             backgroundColor:"white",
             boxShadow: 'rgba(0, 0, 0, 0.75) 0px 5px 15px;'
         },
@@ -73,7 +75,7 @@ const UseStyle = makeStyles((theme: Theme) =>
             height: 'auto',
             borderRadius: '50%',
             marginTop: '40px',
-            border: '1px solid #a47573',
+            border: '1px solid #ffffff20',
             transform: "scaleX(-1)",
             backgroundColor:"white",
             boxShadow: 'rgba(0, 0, 0, 0.75) 0px 5px 15px;'

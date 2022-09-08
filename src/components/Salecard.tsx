@@ -14,20 +14,7 @@ import { formatUnits } from "@ethersproject/units";
 export const Salecard = () => {
   const [mints, setMints] = useState(0);
   const { account, library  } = useWeb3React<Web3Provider>();
-  const [price, setPrice] = useState(0);
-  const [freeClaimed, setFreeClaimed] = useState(false);
 
-  const getFreeClaimStatus = async () => {
-    if(account && library){
-      const signer = await library?.getSigner();
-      const contract = new Contract(NFTContract, abi, signer );
-      const claimed = await contract.isFreeClaimed(account);
-      setFreeClaimed(claimed);
-    }
-  }
-    useEffect(() => {
-      getFreeClaimStatus();
-    }, [account, library])
     useEffect(() => {
         const getMints = async () => {
           const provider = new JsonRpcProvider(rpc);
@@ -35,7 +22,6 @@ export const Salecard = () => {
             contract.on("CreateKishiBurnoNFTNFT", async () => {
                 const mint2 = await contract.totalSupply();
                 setMints(Number(formatUnits(mint2, 0)));
-                await getFreeClaimStatus();
             });
             const mint1 = await contract.totalSupply();
             setMints(Number(formatUnits(mint1, 0)));
@@ -59,7 +45,7 @@ export const Salecard = () => {
       <div className={classes.cost}>1 Kishiburno NFT costs 666 KISHIBURNO tokens.</div>
 
      {!account &&  <Connect />}
-      {account && <Buy freeClaimed={freeClaimed} />}
+      {account && <Buy  />}
     </div>
   );
 };

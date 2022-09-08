@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Chip, IconButton, Theme } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import RemoveCircleOutlinedIcon from "@mui/icons-material/RemoveCircleOutlined";
@@ -5,86 +6,113 @@ import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import { Fragment, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Contract } from "@ethersproject/contracts";
-import { NFTContract } from "../connectors/address";
+import { erc20Address, NFTContract } from "../connectors/address";
 import abi from "../abi/abi.json";
+import erc20 from "../abi/erc20.json";
 import { formatUnits, parseUnits } from "@ethersproject/units";
-interface Props {
-  freeClaimed: boolean;
-}
-export const Buy = ({freeClaimed}: Props) => {
+import {toast} from "react-toastify";
+import { Web3Provider } from "@ethersproject/providers";
+export const Buy = () => {
   const classes = UseStyle();
   const [value, setValue] = useState(1);
-  const [salePrice, setSalePrice] = useState(0);
-  const { account, library } = useWeb3React();
+  const [isWhitelisted, setIsWhitelisted] = useState(false);
+  const { account, library } = useWeb3React<Web3Provider>();
+  const [approveEnabled, setApproveEnabled] = useState(true);
+  const [mintEnabled, setMintEnabled] = useState(false);
+  const [allowance, setAllowance] = useState(0);
+  const pricePerNft: number = 666;
 
   const getSalePriceValue = () => {
-    const price = value * salePrice;
+    const price = value;
     return price.toString();
   };
+
+  useEffect(()=>{
+    if(account){
+      getAllowance();
+    }
+  },[account]);
+
   const handleMint = async () => {
     if (account && library) {
       try {
         const signer = await library.getSigner();
         
           const contract = new Contract(NFTContract, abi, signer);
-          let overRides = {
-            value: parseUnits(getSalePriceValue(), "ether"),
-          };
-          const txResult = await contract.mint(value, overRides);
+          const txResult = await contract.mint();
           await txResult.wait();
-          alert(`${value} E.R.V Gandalf NFT's minted successfully!`);
-        
+          toast.success(`${value} Kishiburno NFT minted successfully!`);
+        await getAllowance();
       } catch (err: any) {
         console.log(err)
-        if (err.error) {
-          if (err.error.code === -32000) {
-            alert("Insufficient Funds");
+        if (err) {
+          if (err.code === -32000) {
+            toast("Insufficient Funds", {type:"error"});
           } else {
-            alert(err.error.message);
+            toast.error(err.message);
             console.log(err.code);
           }
         } else {
-          if (err.error.code === 4001) {
-            alert("User denied transaction signature.");
-          } else alert("Transaction Error");
+          if (err.code === 4001) {
+            toast.error("User denied transaction signature.");
+          } else toast.error("Transaction Error");
         }
       }
     }
   };
-  const claimFreeMint = async () => {
+  
+  const getAllowance = async () => {
+    const signer = await library?.getSigner();
+    const token = new Contract(erc20Address, erc20, signer);
+    let allowanceAmt = await token.allowance(account, NFTContract);
+    allowanceAmt = Number(formatUnits(allowanceAmt, 6));
+    setAllowance(allowanceAmt);
+    if(allowanceAmt >= pricePerNft){
+      setApproveEnabled(false);
+      setMintEnabled(true);
+    }else{
+      setApproveEnabled(true);
+      setMintEnabled(false);
+    }
+    
+  }
+  const handleApprove = async () => {
     if (account && library) {
       try {
         const signer = await library.getSigner();
         
-          const contract = new Contract(NFTContract, abi, signer);
-          const txResult = await contract.mint(value);
+          const contract = new Contract(erc20Address, erc20, signer);
+          const txResult = await contract.approve(NFTContract, 666000000);
           await txResult.wait();
-          alert(`Free E.R.V Gandalf NFT's claimed successfully!`);
-        
+          toast.success(`666 KISHIBURNO tokens approved.`);
+            await getAllowance();
       } catch (err: any) {
         console.log(err)
-        if (err.error) {
-          if (err.error.code === -32000) {
-            alert("Insufficient Funds");
+        if (err) {
+          if (err.code === -32000) {
+            toast("Insufficient Funds", {type:"error"});
           } else {
-            alert(err.error.message);
+            toast.error(err.error.message);
             console.log(err.code);
           }
         } else {
-          if (err.error.code === 4001) {
-            alert("User denied transaction signature.");
-          } else alert("Transaction Error");
+          if (err.code === 4001) {
+            toast.error("User denied transaction signature.");
+          } else toast.error("Transaction Error");
         }
       }
     }
-  };
+  }
   useEffect(() => {
     const getMints = async () => {
-      console.log(library);
       const signer = await library?.getSigner();
       const contract = new Contract(NFTContract, abi, signer);
-      const sp = await contract.salePrice(1);
-      setSalePrice(Number(formatUnits(sp, "ether")));
+      console.log("Contract", contract);
+      const addrInWhitelist = await contract.addressInWhitelist(account);
+      setIsWhitelisted(addrInWhitelist);
+      if(addrInWhitelist){
+        toast("Whitelisted Address", {type:"success"})   
+         }
     };
     if (account && library) {
       getMints();
@@ -92,7 +120,7 @@ export const Buy = ({freeClaimed}: Props) => {
   }, [account, library]);
   const increment = () => {
     
-      if (value < 10) {
+      if (value < 1) {
         setValue((value) => value + 1);
       }
   };
@@ -108,11 +136,13 @@ export const Buy = ({freeClaimed}: Props) => {
         <span>
           <b>Your Address : </b>
           {account}{" "}
+          {
+            isWhitelisted && <Chip color="success" label="whitelisted"/>
+          }
         </span>
       </div>
-      <div className={classes.title}>{freeClaimed ? "Click buy to mint your NFT." : "Click to claim your free NFT."}</div>
-      {
-        freeClaimed ? (
+      <div className={classes.title}>Click buy to mint your NFT.</div>
+      
           <Fragment>
             <div
         style={{
@@ -144,46 +174,40 @@ export const Buy = ({freeClaimed}: Props) => {
         }}
       >
         <Button
-          onClick={() => handleMint()}
+          onClick={() => handleApprove()}
           color="primary"
+          disabled={!approveEnabled}
           sx={{
             fontSize: "12px",
             height: "36px",
             backgroundColor: "#000",
             borderRadius: "18px",
+            marginRight: "8px"
           }}
           variant="contained"
         >
           {" "}
-          Mint E.R.V Gandalf NFT
+          Approve
+        </Button>
+        <Button
+          onClick={() => handleMint()}
+          color="primary"
+          disabled={!mintEnabled}
+          sx={{
+            fontSize: "12px",
+            height: "36px",
+            backgroundColor: "#000",
+            borderRadius: "18px",
+            marginLeft: "8px"
+          }}
+          variant="contained"
+        >
+          {" "}
+          Mint NFT
         </Button>
       </div>
           </Fragment>
-        ) : (
-          <div
-        style={{
-          textAlign: "center",
-          paddingTop: "24px",
-          paddingBottom: "16px",
-        }}
-      >
-        <Button
-          onClick={() => claimFreeMint()}
-          color="primary"
-          sx={{
-            fontSize: "12px",
-            height: "36px",
-            backgroundColor: "#000",
-            borderRadius: "18px",
-          }}
-          variant="contained"
-        >
-          {" "}
-          Claim Free NFT
-        </Button>
-      </div>
-        )
-      }
+        
     </>
   );
 };

@@ -26,7 +26,7 @@ export const Connect = () => {
   const classes = UseStyle();
   const [isOpen, setIsOpen] = useState(false);
   const [switchNet, setSwitchNet] = useState(false);
-  const { activate, error, account, library} = useWeb3React();
+  const { activate, chainId, error, account, library} = useWeb3React();
   const handleMetamaskClick = async () => {
       const result = await activate(injectedConnector);
       console.log("dhjhff",result);
@@ -56,6 +56,7 @@ useEffect(() => {
     console.log(error)
     switch (error.name) {
       case "UnsupportedChainIdError":
+        console.log(chainId);
         toast("Unsupported network, Switch to ethereum", {type: "error"})
         setSwitchNet(true);
         break;

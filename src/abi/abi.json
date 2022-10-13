@@ -7,11 +7,6 @@
         "type": "string"
       },
       {
-        "internalType": "address",
-        "name": "_tokenAddress",
-        "type": "address"
-      },
-      {
         "internalType": "string",
         "name": "_contractURI",
         "type": "string"
@@ -85,7 +80,7 @@
         "type": "uint256"
       }
     ],
-    "name": "CreateKishiBurnoNFTNFT",
+    "name": "CreateKishiBurnoNFT",
     "type": "event"
   },
   {
@@ -487,19 +482,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "token",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

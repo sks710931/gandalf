@@ -9,7 +9,7 @@ export const Home = () => {
     const classes = UseStyle();
     return (
         <div className={classes.main}>
-            <div style={{width: "100%",height:"100vh" ,backdropFilter: "blur(16px)"}}>
+            <div style={{width: "100%",height:"100%" ,backdropFilter: "blur(16px)"}}>
             <Grid container spacing={2}>
                 <Grid item className="top" xs={12}>
                     <div className={classes.center}>

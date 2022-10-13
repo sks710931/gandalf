@@ -13,18 +13,21 @@ import abi from "../abi/abi.json";
 import { formatUnits } from "@ethersproject/units";
 export const Salecard = () => {
   const [mints, setMints] = useState(0);
+  const [price, setPrice] = useState(0);
   const { account, library  } = useWeb3React<Web3Provider>();
 
     useEffect(() => {
         const getMints = async () => {
           const provider = new JsonRpcProvider(rpc);
             const contract = new Contract(NFTContract, abi, provider );
-            contract.on("CreateKishiBurnoNFTNFT", async () => {
+            contract.on("CreateKishiBurnoNFT", async () => {
                 const mint2 = await contract.totalSupply();
                 setMints(Number(formatUnits(mint2, 0)));
             });
             const mint1 = await contract.totalSupply();
             setMints(Number(formatUnits(mint1, 0)));
+            const cost = await contract.PRICE();
+            setPrice(Number(formatUnits(cost, "ether")));
         }
             getMints();
     }, [])
@@ -42,10 +45,10 @@ export const Salecard = () => {
           NFT Contract
         </Button>
       </div>
-      <div className={classes.cost}>1 Kishiburno NFT costs 666 KISHIBURNO tokens.</div>
+      <div className={classes.cost}>1 Kishiburno NFT costs {price} ETH.</div>
 
      {!account &&  <Connect />}
-      {account && <Buy  />}
+      {account && <Buy price={price} />}
     </div>
   );
 };

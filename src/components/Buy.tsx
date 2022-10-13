@@ -12,37 +12,31 @@ import erc20 from "../abi/erc20.json";
 import { formatUnits, parseUnits } from "@ethersproject/units";
 import {toast} from "react-toastify";
 import { Web3Provider } from "@ethersproject/providers";
-export const Buy = () => {
+interface Props{
+  price: number;
+}
+export const Buy = ({price}: Props) => {
   const classes = UseStyle();
   const [value, setValue] = useState(1);
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const { account, library } = useWeb3React<Web3Provider>();
-  const [approveEnabled, setApproveEnabled] = useState(true);
-  const [mintEnabled, setMintEnabled] = useState(false);
-  const [allowance, setAllowance] = useState(0);
-  const pricePerNft: number = 666;
 
   const getSalePriceValue = () => {
-    const price = value;
-    return price.toString();
+    const mintPrice = parseUnits(Number(price*value).toString(), 18);
+    return mintPrice.toString();
   };
-
-  useEffect(()=>{
-    if(account){
-      getAllowance();
-    }
-  },[account]);
 
   const handleMint = async () => {
     if (account && library) {
       try {
         const signer = await library.getSigner();
-        
+        let overrides = {
+          value: getSalePriceValue()
+        }
           const contract = new Contract(NFTContract, abi, signer);
-          const txResult = await contract.mint();
+          const txResult = await contract.mint(overrides);
           await txResult.wait();
           toast.success(`${value} Kishiburno NFT minted successfully!`);
-        await getAllowance();
       } catch (err: any) {
         console.log(err)
         if (err) {
@@ -61,48 +55,8 @@ export const Buy = () => {
     }
   };
   
-  const getAllowance = async () => {
-    const signer = await library?.getSigner();
-    const token = new Contract(erc20Address, erc20, signer);
-    let allowanceAmt = await token.allowance(account, NFTContract);
-    allowanceAmt = Number(formatUnits(allowanceAmt, 6));
-    setAllowance(allowanceAmt);
-    if(allowanceAmt >= pricePerNft){
-      setApproveEnabled(false);
-      setMintEnabled(true);
-    }else{
-      setApproveEnabled(true);
-      setMintEnabled(false);
-    }
-    
-  }
-  const handleApprove = async () => {
-    if (account && library) {
-      try {
-        const signer = await library.getSigner();
-        
-          const contract = new Contract(erc20Address, erc20, signer);
-          const txResult = await contract.approve(NFTContract, 666000000);
-          await txResult.wait();
-          toast.success(`666 KISHIBURNO tokens approved.`);
-            await getAllowance();
-      } catch (err: any) {
-        console.log(err)
-        if (err) {
-          if (err.code === -32000) {
-            toast("Insufficient Funds", {type:"error"});
-          } else {
-            toast.error(err.error.message);
-            console.log(err.code);
-          }
-        } else {
-          if (err.code === 4001) {
-            toast.error("User denied transaction signature.");
-          } else toast.error("Transaction Error");
-        }
-      }
-    }
-  }
+
+  
   useEffect(() => {
     const getMints = async () => {
       const signer = await library?.getSigner();
@@ -173,26 +127,10 @@ export const Buy = () => {
           paddingBottom: "16px",
         }}
       >
-        <Button
-          onClick={() => handleApprove()}
-          color="primary"
-          disabled={!approveEnabled}
-          sx={{
-            fontSize: "12px",
-            height: "36px",
-            backgroundColor: "#000",
-            borderRadius: "18px",
-            marginRight: "8px"
-          }}
-          variant="contained"
-        >
-          {" "}
-          Approve
-        </Button>
+        
         <Button
           onClick={() => handleMint()}
           color="primary"
-          disabled={!mintEnabled}
           sx={{
             fontSize: "12px",
             height: "36px",
